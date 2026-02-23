@@ -9,8 +9,6 @@
   const MEME_FONT = 'Impact, Arial Black, sans-serif';
 
   const imageInput = document.getElementById('imageInput');
-  const topTextInput = document.getElementById('topText');
-  const bottomTextInput = document.getElementById('bottomText');
   const sizeSlider = document.getElementById('sizeSlider');
   const sizeValue = document.getElementById('sizeValue');
   const canvas = document.getElementById('memeCanvas');
@@ -22,20 +20,29 @@
   const galleryCount = document.getElementById('galleryCount');
   const randomBtn = document.getElementById('randomBtn');
   const textColorInput = document.getElementById('textColor');
+  const textLayersList = document.getElementById('textLayersList');
+  const textEditOverlay = document.getElementById('textEditOverlay');
+  const textEditInput = document.getElementById('textEditInput');
 
   let currentImage = null;
   let galleryObserver = null;
   let searchTimeout = null;
-  let topTextPos = null;    // {x, y} in canvas pixels; null = use default
-  let bottomTextPos = null; // {x, y} in canvas pixels; null = use default
-  let dragState = null;     // {target: 'top'|'bottom', offsetX, offsetY}
-  let textBoundsMap = {};   // {top: bounds, bottom: bounds}
+
+  // Text layers: [{id, text, x, y, fontSize, color, bounds}]
+  let textLayers = [];
+  let nextLayerId = 1;
+  let selectedLayerId = null;
+  let editingLayerId = null;
+  let placementPos = null;
+
+  // Drag state
+  let dragState = null;
+  let dragMoved = false;
+
+  // ── Draw ──────────────────────────────────────────────────────────────────
 
   function drawMeme() {
     const ctx = canvas.getContext('2d');
-    const topText = topTextInput.value.trim();
-    const bottomText = bottomTextInput.value.trim();
-    const fontSize = parseInt(sizeSlider.value, 10);
 
     if (!currentImage) {
       canvasWrap.classList.remove('has-image');
@@ -58,37 +65,27 @@
     ctx.lineWidth = borderWidth;
     ctx.strokeRect(borderWidth / 2, borderWidth / 2, width - borderWidth, height - borderWidth);
 
-    if (!topText && !bottomText) {
-      textBoundsMap = {};
-      downloadBtn.disabled = false;
-      return;
-    }
+    textLayers.forEach(function (layer) {
+      ctx.font = `bold ${layer.fontSize}px ${MEME_FONT}`;
+      ctx.textAlign = 'center';
+      layer.bounds = drawStrokeText(ctx, layer.text, layer.x, layer.y, layer.fontSize, layer.color);
 
-    ctx.font = `bold ${fontSize}px ${MEME_FONT}`;
-    ctx.textAlign = 'center';
-
-    const padding = 12;
-    textBoundsMap = {};
-
-    if (topText) {
-      const pos = topTextPos || { x: width / 2, y: padding };
-      textBoundsMap.top = drawStrokeText(ctx, topText, pos.x, pos.y, fontSize);
-    }
-
-    if (bottomText) {
-      let pos = bottomTextPos;
-      if (!pos) {
-        const lines = wrapText(ctx, bottomText, canvas.width - 24);
-        const totalHeight = lines.length * fontSize * 1.2;
-        pos = { x: width / 2, y: height - padding - totalHeight };
+      if (layer.id === selectedLayerId && layer.bounds) {
+        const b = layer.bounds;
+        const pad = 5;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(79, 93, 255, 0.85)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 3]);
+        ctx.strokeRect(b.left - pad, b.top - pad, b.width + pad * 2, b.height + pad * 2);
+        ctx.restore();
       }
-      textBoundsMap.bottom = drawStrokeText(ctx, bottomText, pos.x, pos.y, fontSize);
-    }
+    });
 
     downloadBtn.disabled = false;
   }
 
-  function drawStrokeText(ctx, text, cx, y, fontSize) {
+  function drawStrokeText(ctx, text, cx, y, fontSize, color) {
     const lineHeight = fontSize * 1.2;
     const lines = wrapText(ctx, text, canvas.width - 24);
     ctx.textBaseline = 'top';
@@ -106,7 +103,7 @@
       ctx.lineJoin = 'round';
       ctx.miterLimit = 2;
       ctx.strokeText(line, cx, lineY);
-      ctx.fillStyle = textColorInput.value;
+      ctx.fillStyle = color;
       ctx.fillText(line, cx, lineY);
     });
 
@@ -134,18 +131,28 @@
     };
   }
 
+  function canvasToWrapPos(canvasX, canvasY) {
+    const canvasRect = canvas.getBoundingClientRect();
+    const wrapRect = canvasWrap.getBoundingClientRect();
+    return {
+      x: (canvasX / canvas.width) * canvasRect.width + (canvasRect.left - wrapRect.left),
+      y: (canvasY / canvas.height) * canvasRect.height + (canvasRect.top - wrapRect.top),
+    };
+  }
+
   function hitTest(pos) {
     const HIT_PAD = 8;
-    for (const key of ['top', 'bottom']) {
-      const b = textBoundsMap[key];
-      if (!b) continue;
+    for (let i = textLayers.length - 1; i >= 0; i--) {
+      const layer = textLayers[i];
+      if (!layer.bounds) continue;
+      const b = layer.bounds;
       if (
         pos.x >= b.left - HIT_PAD &&
         pos.x <= b.right + HIT_PAD &&
         pos.y >= b.top - HIT_PAD &&
         pos.y <= b.bottom + HIT_PAD
       ) {
-        return key;
+        return layer.id;
       }
     }
     return null;
@@ -158,19 +165,179 @@
 
     for (const word of words) {
       const testLine = currentLine ? `${currentLine} ${word}` : word;
-      const metrics = ctx.measureText(testLine);
-      if (metrics.width > maxWidth && currentLine) {
+      if (ctx.measureText(testLine).width > maxWidth && currentLine) {
         lines.push(currentLine);
         currentLine = word;
       } else {
         currentLine = testLine;
       }
     }
-    if (currentLine) {
-      lines.push(currentLine);
-    }
+    if (currentLine) lines.push(currentLine);
     return lines.length ? lines : [''];
   }
+
+  // ── Text layer management ─────────────────────────────────────────────────
+
+  function renderLayerList() {
+    textLayersList.innerHTML = '';
+
+    if (textLayers.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'layers-empty';
+      empty.textContent = 'Click the image to place text';
+      textLayersList.appendChild(empty);
+      return;
+    }
+
+    textLayers.forEach(function (layer) {
+      const item = document.createElement('div');
+      item.className = 'layer-item' + (layer.id === selectedLayerId ? ' selected' : '');
+
+      const swatch = document.createElement('span');
+      swatch.className = 'layer-swatch';
+      swatch.style.background = layer.color;
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'layer-text';
+      textSpan.textContent = layer.text;
+
+      const actions = document.createElement('div');
+      actions.className = 'layer-actions';
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'layer-btn';
+      editBtn.title = 'Edit text';
+      editBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+      editBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openEditOverlayForLayer(layer);
+      });
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'layer-btn layer-btn-delete';
+      deleteBtn.title = 'Remove';
+      deleteBtn.innerHTML = '&times;';
+      deleteBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        removeLayer(layer.id);
+      });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+      item.appendChild(swatch);
+      item.appendChild(textSpan);
+      item.appendChild(actions);
+
+      item.addEventListener('click', function () {
+        selectedLayerId = layer.id;
+        const l = textLayers.find(function (x) { return x.id === layer.id; });
+        if (l) {
+          sizeSlider.value = l.fontSize;
+          sizeValue.textContent = l.fontSize + 'px';
+          textColorInput.value = l.color;
+        }
+        renderLayerList();
+        drawMeme();
+      });
+
+      textLayersList.appendChild(item);
+    });
+  }
+
+  function removeLayer(id) {
+    textLayers = textLayers.filter(function (l) { return l.id !== id; });
+    if (selectedLayerId === id) selectedLayerId = null;
+    if (editingLayerId === id) {
+      editingLayerId = null;
+      textEditOverlay.hidden = true;
+    }
+    renderLayerList();
+    drawMeme();
+  }
+
+  // ── Inline text editor overlay ────────────────────────────────────────────
+
+  function showTextEditor(canvasX, canvasY) {
+    editingLayerId = null;
+    placementPos = { x: canvasX, y: canvasY };
+    positionOverlay(canvasX, canvasY);
+    textEditInput.value = '';
+    textEditOverlay.hidden = false;
+    textEditInput.focus();
+  }
+
+  function openEditOverlayForLayer(layer) {
+    editingLayerId = layer.id;
+    placementPos = { x: layer.x, y: layer.y };
+    positionOverlay(layer.x, layer.y);
+    textEditInput.value = layer.text;
+    textEditOverlay.hidden = false;
+    textEditInput.select();
+    textEditInput.focus();
+  }
+
+  function positionOverlay(canvasX, canvasY) {
+    const wrapPos = canvasToWrapPos(canvasX, canvasY);
+    // Clamp so overlay stays within canvas-wrap bounds
+    const overlayW = 220;
+    const wrapW = canvasWrap.getBoundingClientRect().width;
+    const left = Math.min(Math.max(0, wrapPos.x), wrapW - overlayW);
+    textEditOverlay.style.left = left + 'px';
+    textEditOverlay.style.top = wrapPos.y + 'px';
+  }
+
+  function commitText() {
+    const text = textEditInput.value.trim();
+
+    if (editingLayerId !== null) {
+      if (text) {
+        const layer = textLayers.find(function (l) { return l.id === editingLayerId; });
+        if (layer) layer.text = text;
+      } else {
+        removeLayer(editingLayerId);
+      }
+    } else if (text && placementPos) {
+      const newId = nextLayerId++;
+      textLayers.push({
+        id: newId,
+        text: text,
+        x: placementPos.x,
+        y: placementPos.y,
+        fontSize: parseInt(sizeSlider.value, 10),
+        color: textColorInput.value,
+        bounds: null,
+      });
+      selectedLayerId = newId;
+    }
+
+    textEditOverlay.hidden = true;
+    editingLayerId = null;
+    placementPos = null;
+    renderLayerList();
+    drawMeme();
+  }
+
+  function dismissEditor() {
+    textEditOverlay.hidden = true;
+    editingLayerId = null;
+    placementPos = null;
+  }
+
+  textEditInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      commitText();
+    } else if (e.key === 'Escape') {
+      dismissEditor();
+    }
+  });
+
+  textEditInput.addEventListener('blur', function () {
+    setTimeout(function () {
+      if (!textEditOverlay.hidden) commitText();
+    }, 120);
+  });
+
+  // ── Image loading ─────────────────────────────────────────────────────────
 
   function loadImage(file) {
     if (!file || !file.type.startsWith('image/')) return;
@@ -181,8 +348,9 @@
     img.onload = function () {
       URL.revokeObjectURL(url);
       currentImage = img;
-      topTextPos = null;
-      bottomTextPos = null;
+      textLayers = [];
+      selectedLayerId = null;
+      renderLayerList();
       drawMeme();
     };
 
@@ -197,8 +365,9 @@
     const img = new Image();
     img.onload = function () {
       currentImage = img;
-      topTextPos = null;
-      bottomTextPos = null;
+      textLayers = [];
+      selectedLayerId = null;
+      renderLayerList();
       drawMeme();
       canvasWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
@@ -210,14 +379,13 @@
 
   function downloadMeme() {
     if (!currentImage) return;
-
     const link = document.createElement('a');
     link.download = 'meme.png';
     link.href = canvas.toDataURL('image/png');
     link.click();
   }
 
-  // ── Gallery ──────────────────────────────────────────────────────────────
+  // ── Gallery ───────────────────────────────────────────────────────────────
 
   function renderGallery(images) {
     if (galleryObserver) {
@@ -301,8 +469,7 @@
   // ── Event listeners ───────────────────────────────────────────────────────
 
   imageInput.addEventListener('change', function () {
-    const file = this.files[0];
-    loadImage(file);
+    loadImage(this.files[0]);
   });
 
   canvasWrap.addEventListener('dragover', function (e) {
@@ -330,23 +497,42 @@
 
   sizeSlider.addEventListener('input', function () {
     sizeValue.textContent = `${this.value}px`;
-    drawMeme();
+    if (selectedLayerId !== null) {
+      const layer = textLayers.find(function (l) { return l.id === selectedLayerId; });
+      if (layer) {
+        layer.fontSize = parseInt(this.value, 10);
+        drawMeme();
+      }
+    }
   });
 
-  topTextInput.addEventListener('input', drawMeme);
-  bottomTextInput.addEventListener('input', drawMeme);
-  textColorInput.addEventListener('input', drawMeme);
+  textColorInput.addEventListener('input', function () {
+    if (selectedLayerId !== null) {
+      const layer = textLayers.find(function (l) { return l.id === selectedLayerId; });
+      if (layer) {
+        layer.color = this.value;
+        renderLayerList();
+        drawMeme();
+      }
+    }
+  });
 
   downloadBtn.addEventListener('click', downloadMeme);
 
+  // Canvas mouse interactions
   canvas.addEventListener('mousedown', function (e) {
     if (!currentImage) return;
+    dragMoved = false;
     const pos = getCanvasPos(e);
-    const hit = hitTest(pos);
-    if (hit) {
+    const hitId = hitTest(pos);
+    if (hitId !== null) {
       e.preventDefault();
-      const b = textBoundsMap[hit];
-      dragState = { target: hit, offsetX: pos.x - b.cx, offsetY: pos.y - b.y };
+      const layer = textLayers.find(function (l) { return l.id === hitId; });
+      dragState = {
+        layerId: hitId,
+        offsetX: pos.x - layer.bounds.cx,
+        offsetY: pos.y - layer.bounds.y,
+      };
       canvas.style.cursor = 'grabbing';
     }
   });
@@ -355,23 +541,24 @@
     if (!currentImage) return;
     if (dragState) {
       e.preventDefault();
+      dragMoved = true;
       const pos = getCanvasPos(e);
-      const newPos = { x: pos.x - dragState.offsetX, y: pos.y - dragState.offsetY };
-      if (dragState.target === 'top') {
-        topTextPos = newPos;
-      } else {
-        bottomTextPos = newPos;
+      const layer = textLayers.find(function (l) { return l.id === dragState.layerId; });
+      if (layer) {
+        layer.x = pos.x - dragState.offsetX;
+        layer.y = pos.y - dragState.offsetY;
+        drawMeme();
       }
-      drawMeme();
     } else {
       const pos = getCanvasPos(e);
-      canvas.style.cursor = hitTest(pos) ? 'grab' : 'default';
+      const hitId = hitTest(pos);
+      canvas.style.cursor = hitId !== null ? 'grab' : 'crosshair';
     }
   });
 
   canvas.addEventListener('mouseup', function () {
     dragState = null;
-    canvas.style.cursor = 'default';
+    if (currentImage) canvas.style.cursor = 'crosshair';
   });
 
   canvas.addEventListener('mouseleave', function () {
@@ -379,28 +566,61 @@
     canvas.style.cursor = 'default';
   });
 
+  canvas.addEventListener('click', function (e) {
+    if (dragMoved) {
+      dragMoved = false;
+      return;
+    }
+    if (!currentImage) return;
+    if (!textEditOverlay.hidden) return;
+
+    const pos = getCanvasPos(e);
+    const hitId = hitTest(pos);
+
+    if (hitId === null) {
+      showTextEditor(pos.x, pos.y);
+    } else {
+      selectedLayerId = hitId;
+      const layer = textLayers.find(function (l) { return l.id === hitId; });
+      if (layer) {
+        sizeSlider.value = layer.fontSize;
+        sizeValue.textContent = layer.fontSize + 'px';
+        textColorInput.value = layer.color;
+      }
+      renderLayerList();
+      drawMeme();
+    }
+  });
+
+  // Touch support
   canvas.addEventListener('touchstart', function (e) {
     if (!currentImage) return;
+    dragMoved = false;
     const pos = getCanvasPos(e);
-    const hit = hitTest(pos);
-    if (hit) {
+    const hitId = hitTest(pos);
+    if (hitId !== null) {
       e.preventDefault();
-      const b = textBoundsMap[hit];
-      dragState = { target: hit, offsetX: pos.x - b.cx, offsetY: pos.y - b.y };
+      const layer = textLayers.find(function (l) { return l.id === hitId; });
+      dragState = {
+        layerId: hitId,
+        offsetX: pos.x - layer.bounds.cx,
+        offsetY: pos.y - layer.bounds.y,
+      };
+      selectedLayerId = hitId;
     }
   }, { passive: false });
 
   canvas.addEventListener('touchmove', function (e) {
     if (!dragState) return;
     e.preventDefault();
+    dragMoved = true;
     const pos = getCanvasPos(e);
-    const newPos = { x: pos.x - dragState.offsetX, y: pos.y - dragState.offsetY };
-    if (dragState.target === 'top') {
-      topTextPos = newPos;
-    } else {
-      bottomTextPos = newPos;
+    const layer = textLayers.find(function (l) { return l.id === dragState.layerId; });
+    if (layer) {
+      layer.x = pos.x - dragState.offsetX;
+      layer.y = pos.y - dragState.offsetY;
+      drawMeme();
     }
-    drawMeme();
   }, { passive: false });
 
   canvas.addEventListener('touchend', function () {
@@ -425,5 +645,6 @@
   // ── Init ──────────────────────────────────────────────────────────────────
 
   sizeValue.textContent = `${sizeSlider.value}px`;
+  renderLayerList();
   renderGallery(MEME_IMAGES);
 })();

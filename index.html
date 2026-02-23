@@ -35,15 +35,12 @@
         </div>
       </div>
 
-      <div class="text-inputs">
-        <div class="text-field-wrap">
-          <label for="topText" class="label">Top text</label>
-          <input type="text" id="topText" class="text-field" placeholder="Top text..." maxlength="100" />
+      <div class="text-layers-panel">
+        <div class="text-layers-header">
+          <label class="label">Text layers</label>
+          <span class="text-layers-hint">Click image to place text</span>
         </div>
-        <div class="text-field-wrap">
-          <label for="bottomText" class="label">Bottom text</label>
-          <input type="text" id="bottomText" class="text-field" placeholder="Bottom text..." maxlength="100" />
-        </div>
+        <div id="textLayersList" class="text-layers-list"></div>
       </div>
     </section>
 
@@ -62,11 +59,14 @@
         <div class="canvas-placeholder" id="canvasPlaceholder">
           Choose an image to get started
         </div>
+        <div id="textEditOverlay" class="text-edit-overlay" hidden>
+          <input type="text" id="textEditInput" class="text-edit-input" placeholder="Type and press Enter..." maxlength="200" autocomplete="off" />
+        </div>
       </div>
       <button type="button" id="downloadBtn" class="btn btn-primary" disabled>
         Download Meme
       </button>
-      <p class="canvas-hint">Drag text on the canvas to reposition it</p>
+      <p class="canvas-hint">Click image to add text &middot; Drag to reposition &middot; Click layer to resize/recolor</p>
     </section>
   </main>
 
