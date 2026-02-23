@@ -1,0 +1,731 @@
+{
+  "$schema": "https://example.com/schemas/design-system.v1.json",
+  "meta": {
+    "name": "Soft Card UI (Screenshot-derived)",
+    "version": "1.0.0",
+    "source": {
+      "reference": "assets/image-71bc44d4-4635-4684-8aa3-fd17dfa0249a.png",
+      "notes": "Design guidelines inferred from the provided screenshot. Values are approximate but tuned to reproduce the same overall look."
+    },
+    "intent": "Provide a high-level design system description (tokens + component specs + usage rules) that an AI can follow to replicate this UI style consistently across the app."
+  },
+  "designStyle": {
+    "keywords": [
+      "soft",
+      "airy",
+      "friendly",
+      "card-based",
+      "rounded",
+      "subtle shadows",
+      "low-contrast neutrals",
+      "high-saturation accents",
+      "pill controls",
+      "clean iconography"
+    ],
+    "visualPrinciples": [
+      "Use generous whitespace and clear grouping via cards.",
+      "Prefer subtle elevation over heavy borders; borders are hairline and low contrast.",
+      "Use bright, saturated accents sparingly for interactive elements and statuses.",
+      "Keep typography simple: compact headings, readable body, slightly bolder control labels.",
+      "Favor pill shapes for chips and segmented controls; use consistent corner radii."
+    ],
+    "accessibilityPrinciples": [
+      "Maintain visible focus indicators on all interactive elements.",
+      "Use semantic color + text/icon pairing for status (never rely on color alone).",
+      "Ensure sufficient contrast for text on colored surfaces; if contrast is low, increase text weight or darken the shade."
+    ]
+  },
+  "foundations": {
+    "color": {
+      "mode": "light",
+      "neutrals": {
+        "bg": "#F6F7FB",
+        "surface": "#FFFFFF",
+        "surfaceMuted": "#F9FAFE",
+        "text": "#0F172A",
+        "textMuted": "#667085",
+        "textSubtle": "#98A2B3",
+        "border": "#E6E8F0",
+        "borderStrong": "#D7DBE8",
+        "shadowTint": "rgba(15, 23, 42, 0.08)"
+      },
+      "palette": {
+        "primary": {
+          "50": "#EEF0FF",
+          "100": "#E1E4FF",
+          "200": "#C7CCFF",
+          "300": "#A2AAFF",
+          "400": "#7480FF",
+          "500": "#4F5DFF",
+          "600": "#3D49F5",
+          "700": "#3038D9",
+          "800": "#252CA6",
+          "900": "#1D237A"
+        },
+        "emerald": {
+          "50": "#E9FBF2",
+          "100": "#CCF6E0",
+          "200": "#9FEEBF",
+          "300": "#72E39C",
+          "400": "#41D37A",
+          "500": "#22C55E",
+          "600": "#16A34A",
+          "700": "#15803D",
+          "800": "#166534",
+          "900": "#14532D"
+        },
+        "orange": {
+          "50": "#FFF2EC",
+          "100": "#FFE3D6",
+          "200": "#FFC6AC",
+          "300": "#FFA67E",
+          "400": "#FF8A57",
+          "500": "#FF7A45",
+          "600": "#F15A22",
+          "700": "#C74415",
+          "800": "#9B3612",
+          "900": "#7A2E12"
+        },
+        "yellow": {
+          "50": "#FFF8DB",
+          "100": "#FFEEB0",
+          "200": "#FFE07A",
+          "300": "#F9CC45",
+          "400": "#F2B400",
+          "500": "#D79A00",
+          "600": "#B67E00",
+          "700": "#8E6100",
+          "800": "#6D4A00",
+          "900": "#533800"
+        },
+        "red": {
+          "50": "#FFECEE",
+          "100": "#FFD3D9",
+          "200": "#FFADB9",
+          "300": "#FF879C",
+          "400": "#FF5F79",
+          "500": "#FF4D6D",
+          "600": "#E11D48",
+          "700": "#BE123C",
+          "800": "#9F1239",
+          "900": "#881337"
+        },
+        "secondary": {
+          "blue": "#0B63FF",
+          "purple": "#6D28D9",
+          "pink": "#E23D92",
+          "cyan": "#1BA9D9",
+          "gray": "#9CA3AF"
+        }
+      },
+      "semantic": {
+        "interactive": {
+          "primaryBg": "{color.palette.primary.500}",
+          "primaryBgHover": "{color.palette.primary.600}",
+          "primaryBgActive": "{color.palette.primary.700}",
+          "primaryFg": "#FFFFFF",
+          "secondaryBg": "#FFFFFF",
+          "secondaryFg": "{color.neutrals.text}",
+          "secondaryBorder": "{color.neutrals.border}",
+          "secondaryBgHover": "{color.neutrals.surfaceMuted}",
+          "disabledBg": "#EEF1F7",
+          "disabledFg": "#A3ACBA"
+        },
+        "status": {
+          "successBg": "{color.palette.emerald.100}",
+          "successFg": "{color.palette.emerald.700}",
+          "warningBg": "{color.palette.yellow.100}",
+          "warningFg": "{color.palette.yellow.800}",
+          "dangerBg": "{color.palette.red.100}",
+          "dangerFg": "{color.palette.red.700}",
+          "infoBg": "{color.palette.primary.100}",
+          "infoFg": "{color.palette.primary.700}"
+        },
+        "banner": {
+          "dangerSoftBg": "#FFE9EC",
+          "dangerSoftBorder": "#FFD0D8",
+          "dangerSoftFg": "{color.palette.red.700}"
+        }
+      }
+    },
+    "typography": {
+      "fontFamilies": {
+        "sans": [
+          "Inter",
+          "ui-sans-serif",
+          "system-ui",
+          "-apple-system",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica",
+          "Arial"
+        ],
+        "mono": [
+          "ui-monospace",
+          "SFMono-Regular",
+          "Menlo",
+          "Consolas",
+          "Liberation Mono",
+          "monospace"
+        ]
+      },
+      "scalePx": {
+        "xs": 12,
+        "sm": 13,
+        "md": 14,
+        "lg": 16,
+        "xl": 18,
+        "2xl": 20
+      },
+      "lineHeights": {
+        "tight": 1.15,
+        "normal": 1.35,
+        "relaxed": 1.5
+      },
+      "weights": {
+        "regular": 400,
+        "medium": 500,
+        "semibold": 600
+      },
+      "styles": {
+        "pageTitle": {
+          "fontFamily": "{typography.fontFamilies.sans}",
+          "fontSize": "{typography.scalePx.2xl}",
+          "fontWeight": "{typography.weights.semibold}",
+          "lineHeight": "{typography.lineHeights.tight}",
+          "letterSpacing": "-0.01em"
+        },
+        "sectionTitle": {
+          "fontFamily": "{typography.fontFamilies.sans}",
+          "fontSize": "{typography.scalePx.xl}",
+          "fontWeight": "{typography.weights.semibold}",
+          "lineHeight": "{typography.lineHeights.tight}",
+          "letterSpacing": "-0.01em"
+        },
+        "body": {
+          "fontFamily": "{typography.fontFamilies.sans}",
+          "fontSize": "{typography.scalePx.md}",
+          "fontWeight": "{typography.weights.regular}",
+          "lineHeight": "{typography.lineHeights.relaxed}"
+        },
+        "label": {
+          "fontFamily": "{typography.fontFamilies.sans}",
+          "fontSize": "{typography.scalePx.sm}",
+          "fontWeight": "{typography.weights.medium}",
+          "lineHeight": "{typography.lineHeights.normal}"
+        },
+        "caption": {
+          "fontFamily": "{typography.fontFamilies.sans}",
+          "fontSize": "{typography.scalePx.xs}",
+          "fontWeight": "{typography.weights.regular}",
+          "lineHeight": "{typography.lineHeights.normal}"
+        }
+      }
+    },
+    "spacing": {
+      "baseUnitPx": 4,
+      "scalePx": {
+        "0": 0,
+        "1": 4,
+        "2": 8,
+        "3": 12,
+        "4": 16,
+        "5": 20,
+        "6": 24,
+        "7": 28,
+        "8": 32,
+        "10": 40,
+        "12": 48
+      },
+      "layout": {
+        "pagePadding": 24,
+        "cardPadding": 16,
+        "denseCardPadding": 12,
+        "gutter": 16,
+        "stackGap": 12
+      }
+    },
+    "radii": {
+      "xs": 6,
+      "sm": 8,
+      "md": 12,
+      "lg": 16,
+      "xl": 20,
+      "pill": 999
+    },
+    "borders": {
+      "widthPx": {
+        "hairline": 1,
+        "strong": 2
+      }
+    },
+    "elevation": {
+      "shadow": {
+        "sm": "0 1px 2px rgba(15, 23, 42, 0.06)",
+        "md": "0 6px 18px rgba(15, 23, 42, 0.08)",
+        "lg": "0 12px 32px rgba(15, 23, 42, 0.10)"
+      }
+    },
+    "focus": {
+      "ring": {
+        "color": "rgba(79, 93, 255, 0.35)",
+        "widthPx": 3,
+        "offsetPx": 2
+      }
+    },
+    "iconography": {
+      "style": "rounded, outlined, simple shapes; filled used sparingly for emphasis",
+      "strokeWidthPx": 1.5,
+      "sizesPx": {
+        "sm": 16,
+        "md": 20
+      }
+    },
+    "motion": {
+      "durationsMs": {
+        "fast": 120,
+        "normal": 180,
+        "slow": 240
+      },
+      "easing": {
+        "standard": "cubic-bezier(0.2, 0.0, 0.0, 1.0)",
+        "out": "cubic-bezier(0.0, 0.0, 0.0, 1.0)"
+      }
+    }
+  },
+  "layoutGuidelines": {
+    "appBackground": {
+      "color": "{foundations.color.neutrals.bg}",
+      "defaultTextColor": "{foundations.color.neutrals.text}"
+    },
+    "card": {
+      "bg": "{foundations.color.neutrals.surface}",
+      "radius": "{foundations.radii.lg}",
+      "border": "1px solid {foundations.color.neutrals.border}",
+      "shadow": "{foundations.elevation.shadow.sm}",
+      "paddingPx": "{foundations.spacing.layout.cardPadding}"
+    },
+    "density": {
+      "default": "comfortable",
+      "comfortable": {
+        "controlHeight": 36,
+        "rowHeight": 52
+      },
+      "compact": {
+        "controlHeight": 32,
+        "rowHeight": 44
+      }
+    }
+  },
+  "components": {
+    "Button": {
+      "description": "Rounded rectangle buttons with solid primary and soft/outlined secondary styles, as shown in the screenshot's Large/Medium/Small/Tiny examples.",
+      "shared": {
+        "radius": "{foundations.radii.sm}",
+        "font": "{foundations.typography.styles.label}",
+        "shadow": "none",
+        "iconGapPx": 8,
+        "focusRing": "{foundations.focus.ring}"
+      },
+      "sizes": {
+        "lg": { "heightPx": 44, "paddingX": 16, "paddingY": 10, "fontSizePx": 14 },
+        "md": { "heightPx": 36, "paddingX": 14, "paddingY": 8, "fontSizePx": 13 },
+        "sm": { "heightPx": 30, "paddingX": 12, "paddingY": 6, "fontSizePx": 12 },
+        "xs": { "heightPx": 24, "paddingX": 10, "paddingY": 4, "fontSizePx": 12 }
+      },
+      "variants": {
+        "primary": {
+          "bg": "{foundations.color.semantic.interactive.primaryBg}",
+          "fg": "{foundations.color.semantic.interactive.primaryFg}",
+          "border": "none",
+          "hover": { "bg": "{foundations.color.semantic.interactive.primaryBgHover}" },
+          "active": { "bg": "{foundations.color.semantic.interactive.primaryBgActive}" },
+          "disabled": {
+            "bg": "{foundations.color.semantic.interactive.disabledBg}",
+            "fg": "{foundations.color.semantic.interactive.disabledFg}"
+          }
+        },
+        "secondary": {
+          "bg": "{foundations.color.semantic.interactive.secondaryBg}",
+          "fg": "{foundations.color.semantic.interactive.secondaryFg}",
+          "border": "1px solid {foundations.color.semantic.interactive.secondaryBorder}",
+          "hover": { "bg": "{foundations.color.semantic.interactive.secondaryBgHover}" }
+        },
+        "ghost": {
+          "bg": "transparent",
+          "fg": "{foundations.color.neutrals.textMuted}",
+          "border": "none",
+          "hover": { "bg": "{foundations.color.neutrals.surfaceMuted}" }
+        },
+        "dark": {
+          "bg": "#0B0F1A",
+          "fg": "#FFFFFF",
+          "border": "none",
+          "hover": { "bg": "#111827" }
+        }
+      }
+    },
+    "IconButton": {
+      "radius": "{foundations.radii.sm}",
+      "sizePx": 32,
+      "bg": "#FFFFFF",
+      "border": "1px solid {foundations.color.neutrals.border}",
+      "hover": { "bg": "{foundations.color.neutrals.surfaceMuted}" },
+      "iconSizePx": "{foundations.iconography.sizesPx.sm}"
+    },
+    "Chip": {
+      "description": "Pill-shaped tags for categories and statuses (e.g., Hot Desk, Wi‑Fi, Pending, Confirmed, Alert, Active, Closed).",
+      "shape": {
+        "radius": "{foundations.radii.pill}",
+        "heightPx": 22,
+        "paddingX": 10,
+        "paddingY": 4
+      },
+      "text": {
+        "font": "{foundations.typography.styles.caption}",
+        "fontWeight": "{foundations.typography.weights.medium}"
+      },
+      "variants": {
+        "neutralOutline": {
+          "bg": "#FFFFFF",
+          "fg": "{foundations.color.neutrals.textMuted}",
+          "border": "1px solid {foundations.color.neutrals.border}"
+        },
+        "success": {
+          "bg": "{foundations.color.semantic.status.successBg}",
+          "fg": "{foundations.color.semantic.status.successFg}",
+          "border": "none"
+        },
+        "warning": {
+          "bg": "{foundations.color.semantic.status.warningBg}",
+          "fg": "{foundations.color.semantic.status.warningFg}",
+          "border": "none"
+        },
+        "danger": {
+          "bg": "{foundations.color.semantic.status.dangerBg}",
+          "fg": "{foundations.color.semantic.status.dangerFg}",
+          "border": "none"
+        },
+        "info": {
+          "bg": "{foundations.color.semantic.status.infoBg}",
+          "fg": "{foundations.color.semantic.status.infoFg}",
+          "border": "none"
+        },
+        "tooltipDark": {
+          "bg": "#0B0F1A",
+          "fg": "#FFFFFF",
+          "border": "none",
+          "shadow": "{foundations.elevation.shadow.md}"
+        }
+      },
+      "affordances": {
+        "withDot": { "dotSizePx": 6, "dotGapPx": 6 },
+        "dismissible": { "closeIconSizePx": 12, "closePaddingLeftPx": 6 }
+      }
+    },
+    "SegmentedControl": {
+      "description": "Grouped options with a soft container and a filled active pill (e.g., Card View / Calendar View / Floorplan View; Month/Week/Day).",
+      "container": {
+        "bg": "{foundations.color.neutrals.surfaceMuted}",
+        "radius": "{foundations.radii.pill}",
+        "paddingPx": 4,
+        "border": "1px solid {foundations.color.neutrals.border}"
+      },
+      "item": {
+        "radius": "{foundations.radii.pill}",
+        "heightPx": 30,
+        "paddingX": 10,
+        "font": "{foundations.typography.styles.caption}",
+        "inactive": { "fg": "{foundations.color.neutrals.textMuted}", "bg": "transparent" },
+        "active": {
+          "fg": "{foundations.color.neutrals.text}",
+          "bg": "#FFFFFF",
+          "shadow": "{foundations.elevation.shadow.sm}"
+        }
+      }
+    },
+    "Tabs": {
+      "description": "Pill-like tabs with one dark/filled active option (e.g., My Inbox selected).",
+      "tab": {
+        "radius": "{foundations.radii.pill}",
+        "heightPx": 32,
+        "paddingX": 12,
+        "font": "{foundations.typography.styles.caption}"
+      },
+      "states": {
+        "inactive": {
+          "bg": "#FFFFFF",
+          "fg": "{foundations.color.neutrals.textMuted}",
+          "border": "1px solid {foundations.color.neutrals.border}"
+        },
+        "activeDark": { "bg": "#0B0F1A", "fg": "#FFFFFF", "border": "none" }
+      }
+    },
+    "Card": {
+      "bg": "{foundations.color.neutrals.surface}",
+      "radius": "{foundations.radii.lg}",
+      "border": "1px solid {foundations.color.neutrals.border}",
+      "shadow": "{foundations.elevation.shadow.sm}",
+      "header": {
+        "titleStyle": "{foundations.typography.styles.sectionTitle}",
+        "metaStyle": "{foundations.typography.styles.caption}"
+      },
+      "sections": {
+        "divider": "1px solid {foundations.color.neutrals.border}",
+        "sectionGapPx": 12
+      }
+    },
+    "TableList": {
+      "description": "Card-contained lists/tables with avatar, name, small metadata, and right-aligned status chips.",
+      "container": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.lg}",
+        "border": "1px solid {foundations.color.neutrals.border}"
+      },
+      "row": {
+        "heightPx": 52,
+        "paddingX": 14,
+        "divider": "1px solid {foundations.color.neutrals.border}",
+        "hover": { "bg": "{foundations.color.neutrals.surfaceMuted}" }
+      },
+      "header": {
+        "textStyle": "{foundations.typography.styles.caption}",
+        "fg": "{foundations.color.neutrals.textSubtle}",
+        "paddingX": 14,
+        "paddingY": 10
+      }
+    },
+    "Avatar": {
+      "sizesPx": { "sm": 24, "md": 32, "lg": 40 },
+      "shape": "circle",
+      "fallback": {
+        "bg": "#EEF1F7",
+        "fg": "{foundations.color.neutrals.textMuted}",
+        "fontWeight": "{foundations.typography.weights.semibold}"
+      },
+      "ring": { "enabled": true, "color": "#FFFFFF", "widthPx": 2 }
+    },
+    "AvatarGroup": {
+      "overlapPx": 8,
+      "showCountAfter": 5,
+      "countPill": {
+        "bg": "{foundations.color.neutrals.surfaceMuted}",
+        "fg": "{foundations.color.neutrals.textMuted}",
+        "radius": "{foundations.radii.pill}",
+        "heightPx": 24,
+        "paddingX": 8
+      }
+    },
+    "TextField": {
+      "description": "Rounded inputs with subtle border and optional embedded chips (multi-select) as shown in 'Invite to Conversation' and 'Tags'.",
+      "field": {
+        "heightPx": 36,
+        "radius": "{foundations.radii.sm}",
+        "bg": "#FFFFFF",
+        "fg": "{foundations.color.neutrals.text}",
+        "placeholderFg": "{foundations.color.neutrals.textSubtle}",
+        "border": "1px solid {foundations.color.neutrals.border}",
+        "paddingX": 12
+      },
+      "states": {
+        "hover": { "border": "1px solid {foundations.color.neutrals.borderStrong}" },
+        "focus": {
+          "border": "1px solid {foundations.color.palette.primary.400}",
+          "ring": "{foundations.focus.ring}"
+        },
+        "error": {
+          "border": "1px solid {foundations.color.palette.red.400}",
+          "ring": { "color": "rgba(255, 77, 109, 0.25)", "widthPx": 3, "offsetPx": 2 }
+        }
+      },
+      "embeddedChip": {
+        "useComponent": "Chip",
+        "variant": "neutralOutline",
+        "heightPx": 22
+      }
+    },
+    "SelectMenu": {
+      "description": "Dropdown/combobox menu (as implied by the invite field and left menu).",
+      "trigger": { "useComponent": "TextField" },
+      "menu": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.md}",
+        "border": "1px solid {foundations.color.neutrals.border}",
+        "shadow": "{foundations.elevation.shadow.md}",
+        "paddingY": 6
+      },
+      "item": {
+        "heightPx": 36,
+        "paddingX": 12,
+        "radius": "{foundations.radii.sm}",
+        "hover": { "bg": "{foundations.color.neutrals.surfaceMuted}" },
+        "active": { "bg": "{foundations.color.palette.primary.50}" }
+      }
+    },
+    "SidebarNav": {
+      "description": "Minimal vertical menu with icon + label rows inside a card.",
+      "container": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.lg}",
+        "border": "1px solid {foundations.color.neutrals.border}"
+      },
+      "item": {
+        "heightPx": 36,
+        "paddingX": 12,
+        "gapPx": 10,
+        "radius": "{foundations.radii.sm}",
+        "fg": "{foundations.color.neutrals.textMuted}",
+        "active": { "bg": "{foundations.color.neutrals.surfaceMuted}", "fg": "{foundations.color.neutrals.text}" }
+      }
+    },
+    "Banner": {
+      "description": "Inline full-width alert banners inside cards (pink/red soft background) as shown above the booking card and warning banner.",
+      "base": {
+        "radius": "{foundations.radii.md}",
+        "paddingX": 12,
+        "paddingY": 10,
+        "border": "1px solid {foundations.color.neutrals.border}",
+        "iconSizePx": 16
+      },
+      "variants": {
+        "dangerSoft": {
+          "bg": "{foundations.color.semantic.banner.dangerSoftBg}",
+          "border": "1px solid {foundations.color.semantic.banner.dangerSoftBorder}",
+          "fg": "{foundations.color.semantic.banner.dangerSoftFg}"
+        },
+        "dangerMinimal": {
+          "bg": "#FFF5F7",
+          "border": "1px solid #FFE3EA",
+          "fg": "{foundations.color.semantic.banner.dangerSoftFg}"
+        }
+      }
+    },
+    "ProgressBar": {
+      "track": {
+        "heightPx": 6,
+        "radius": "{foundations.radii.pill}",
+        "bg": "#EEF1F7"
+      },
+      "fill": {
+        "radius": "{foundations.radii.pill}",
+        "bg": "{foundations.color.palette.primary.500}"
+      },
+      "label": {
+        "leftStyle": "{foundations.typography.styles.caption}",
+        "rightStyle": "{foundations.typography.styles.caption}",
+        "fg": "{foundations.color.neutrals.textMuted}"
+      }
+    },
+    "Tooltip": {
+      "bg": "#0B0F1A",
+      "fg": "#FFFFFF",
+      "radius": "{foundations.radii.md}",
+      "paddingX": 10,
+      "paddingY": 8,
+      "shadow": "{foundations.elevation.shadow.md}",
+      "textStyle": "{foundations.typography.styles.caption}"
+    },
+    "EmptyState": {
+      "illustrationStyle": "simple outline illustration in muted gray",
+      "titleStyle": "{foundations.typography.styles.label}",
+      "bodyStyle": "{foundations.typography.styles.caption}",
+      "container": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.lg}",
+        "border": "1px dashed {foundations.color.neutrals.borderStrong}",
+        "paddingPx": 20
+      },
+      "primaryAction": { "useComponent": "Button", "variant": "primary", "size": "md" }
+    },
+    "Switch": {
+      "track": {
+        "widthPx": 40,
+        "heightPx": 22,
+        "radius": "{foundations.radii.pill}",
+        "offBg": "#E9EDF5",
+        "onBg": "{foundations.color.palette.emerald.500}"
+      },
+      "thumb": { "sizePx": 18, "bg": "#FFFFFF", "shadow": "{foundations.elevation.shadow.sm}" }
+    },
+    "Divider": {
+      "color": "{foundations.color.neutrals.border}",
+      "thicknessPx": 1
+    },
+    "Skeleton": {
+      "bg": "#EEF1F7",
+      "shine": "rgba(255, 255, 255, 0.75)",
+      "radius": "{foundations.radii.md}"
+    },
+    "ModalDialog": {
+      "overlay": "rgba(15, 23, 42, 0.35)",
+      "panel": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.xl}",
+        "shadow": "{foundations.elevation.shadow.lg}",
+        "border": "1px solid {foundations.color.neutrals.border}",
+        "paddingPx": 20
+      }
+    },
+    "Toast": {
+      "container": {
+        "bg": "#FFFFFF",
+        "radius": "{foundations.radii.md}",
+        "shadow": "{foundations.elevation.shadow.md}",
+        "border": "1px solid {foundations.color.neutrals.border}",
+        "paddingX": 12,
+        "paddingY": 10
+      },
+      "titleStyle": "{foundations.typography.styles.label}",
+      "bodyStyle": "{foundations.typography.styles.caption}"
+    }
+  },
+  "compositionRules": {
+    "spacing": [
+      "Use 8px or 12px as the default gap between related controls inside a card.",
+      "Use 16px padding inside most cards; use 12px for dense list cards.",
+      "Use 24px+ between separate sections on a page."
+    ],
+    "alignment": [
+      "Align controls to consistent baselines; use equal heights within button groups.",
+      "Right-align meta values (counts, prices) and keep labels left-aligned."
+    ],
+    "colorUsage": [
+      "Primary blue is reserved for primary calls-to-action, progress fills, and key highlights.",
+      "Statuses use soft tinted backgrounds with darker text (success/warning/danger).",
+      "Dark/black filled pills are used sparingly to indicate the currently selected 'mode' or 'inbox' style tab."
+    ],
+    "bordersVsShadows": [
+      "Default components use a 1px low-contrast border; elevation is subtle and used mostly for cards, popovers, and selected segmented items."
+    ],
+    "text": [
+      "Prefer short, sentence-case labels (e.g., 'Large Button', 'Join a Plan').",
+      "Use muted gray for secondary information (timestamps, helper text)."
+    ]
+  },
+  "componentChecklist": {
+    "mustImplementToMatchScreenshot": [
+      "Button (primary/secondary/ghost/dark, 4 sizes, optional leading icon)",
+      "Chip/Tag (neutral outline + success/warning/danger/info + dark tooltip chip)",
+      "SegmentedControl (soft container + filled active pill)",
+      "Tabs (outlined inactive + dark filled active)",
+      "Card (soft border + subtle shadow)",
+      "TableList (header + rows with avatar, counts, status)",
+      "TextField (standard + multiselect chips in field)",
+      "SelectMenu/Dropdown (card-like popover)",
+      "Avatar + AvatarGroup",
+      "Banner (soft danger/warning style)",
+      "ProgressBar",
+      "SidebarNav",
+      "EmptyState",
+      "Switch"
+    ],
+    "recommendedForCompleteness": [
+      "ModalDialog",
+      "Toast",
+      "Tooltip",
+      "Divider",
+      "Skeleton"
+    ]
+  }
+}
+
